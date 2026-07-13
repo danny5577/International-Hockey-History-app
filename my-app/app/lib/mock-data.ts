@@ -67,6 +67,10 @@ export const games: Game[] = [
   // --- 2004, Prague ---
   { id: "g2004-final", tournamentId: "wc-2004", stage: "final", date: "2004-05-09", homeTeamId: "can", awayTeamId: "swe", homeScore: 5, awayScore: 3 },
   { id: "g2004-bronze", tournamentId: "wc-2004", stage: "bronze", date: "2004-05-09", homeTeamId: "usa", awayTeamId: "svk", homeScore: 1, awayScore: 0, overtime: true },
+
+  // ---2002, Salt Lake City ---
+  { id: "og2002-final", tournamentId: "og-2002", stage: "final", date: "2004-02-24", homeTeamId: "usa", awayTeamId: "can", homeScore: 2, awayScore: 5 },
+
 ];
 
 export const playerStats: PlayerStat[] = []; // intentionally empty — added later
