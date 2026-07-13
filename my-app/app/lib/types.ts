@@ -13,6 +13,7 @@ export interface Team {
   id: string;           // e.g. "svk"
   name: string;         // "Slovakia"
   code: string;         // "SVK" — IIHF 3-letter code
+  isoCode: string;    // ISO 3166-1 alpha-2, lowercase, e.g. "sk" — for flags
 }
 
 export type GameStage =
@@ -34,4 +35,17 @@ export interface Game {
   homeScore: number;
   awayScore: number;
   overtime?: boolean;
+}
+
+export interface PlayerStat {
+  id: string;
+  tournamentId: string;
+  teamId: string;
+  playerName: string;
+  position?: "F" | "D" | "G";
+  gamesPlayed: number;
+  goals: number;
+  assists: number;
+  points: number;
+  penaltyMinutes: number;
 }

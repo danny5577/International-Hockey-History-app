@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTournament, getGamesForTournament } from "@/app/lib/mock-data";
+import { getTournament, getGamesForTournament, getTeamsInTournament } from "@/app/lib/mock-data";
 import { GameRow } from "@/app/components/GameRow";
 import { Game } from "@/app/lib/types";
 import { computeStandings } from "@/app/lib/mock-data";
 import { StandingsTable } from "@/app/components/StandingsTable";
+import { TournamentView } from "@/app/components/TournamentView";
 
 export default async function OlympicsTournamentPage({
   params,
@@ -21,6 +22,7 @@ export default async function OlympicsTournamentPage({
   const allGames = getGamesForTournament(tournament.id);
   const groupGames = allGames.filter((g) => g.stage === "group");
   const playoffGames = allGames.filter((g) => g.stage !== "group");
+   const teamsInTournament = getTeamsInTournament(allGames);
 
   // group the group-stage games by their groupName ("A", "B", ...)
   const groups = groupGames.reduce<Record<string, Game[]>>((acc, game) => {
@@ -43,32 +45,11 @@ export default async function OlympicsTournamentPage({
         Hosted by {tournament.host} · {tournament.startDate} to {tournament.endDate}
       </p>
 
-     {Object.entries(groups).map(([groupName, gamesInGroup]) => (
-  <section key={groupName} className="mb-10">
-    <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
-      Group {groupName}
-    </h2>
-    <StandingsTable rows={computeStandings(gamesInGroup)} />
-    <div className="flex flex-col gap-2">
-      {gamesInGroup.map((g) => (
-        <GameRow key={g.id} game={g} />
-      ))}
-     </div>
-    </section>
-    ))}
-
-      {playoffGames.length > 0 && (
-        <section>
-          <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
-            Playoffs
-          </h2>
-          <div className="flex flex-col gap-2">
-            {playoffGames.map((g) => (
-              <GameRow key={g.id} game={g} />
-            ))}
-          </div>
-        </section>
-      )}
+     <TournamentView
+        groups={groups}
+        playoffGames={playoffGames}
+        teams={teamsInTournament}
+      />
     </div>
   );
 }

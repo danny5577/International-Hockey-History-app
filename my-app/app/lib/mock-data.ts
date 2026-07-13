@@ -1,4 +1,4 @@
-import { TournamentType, Tournament, Team, Game } from "./types";
+import { TournamentType, Tournament, Team, Game, PlayerStat } from "./types";
 
 export function getTournament(type: TournamentType, year: number) {
   return tournaments.find((t) => t.type === type && t.year === year);
@@ -12,23 +12,23 @@ export function getTeam(teamId: string) {
   return teams.find((t) => t.id === teamId);
 }
 
+export function getTeamsInTournament(gamesInTournament: Game[]): Team[] {
+  const ids = new Set<string>();
+  for (const g of gamesInTournament) {
+    ids.add(g.homeTeamId);
+    ids.add(g.awayTeamId);
+  }
+  return teams
+    .filter((t) => ids.has(t.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export const tournaments: Tournament[] = [
-  {
-    id: "wc-2002",
-    type: "WC",
-    year: 2002,
-    host: "Sweden",
-    startDate: "2002-04-27",
-    endDate: "2002-05-12",
-  },
-  {
-    id: "wc-2000",
-    type: "WC",
-    year: 2000,
-    host: "Russia",
-    startDate: "2000-04-29",
-    endDate: "2000-05-14",
-  },
+   { id: "wc-2000", type: "WC", year: 2000, host: "Russia", startDate: "2000-04-29", endDate: "2000-05-14" },
+  { id: "wc-2001", type: "WC", year: 2001, host: "Germany", startDate: "2001-04-28", endDate: "2001-05-13" },
+  { id: "wc-2002", type: "WC", year: 2002, host: "Sweden", startDate: "2002-04-27", endDate: "2002-05-12" },
+  { id: "wc-2003", type: "WC", year: 2003, host: "Finland", startDate: "2003-04-26", endDate: "2003-05-11" },
+  { id: "wc-2004", type: "WC", year: 2004, host: "Czech Republic", startDate: "2004-04-24", endDate: "2004-05-09" },
   {
     id: "og-2002",
     type: "OG",
@@ -40,35 +40,42 @@ export const tournaments: Tournament[] = [
 ];
 
 export const teams: Team[] = [
-  { id: "svk", name: "Slovakia", code: "SVK" },
-  { id: "rus", name: "Russia", code: "RUS" },
-  { id: "swe", name: "Sweden", code: "SWE" },
-  { id: "cze", name: "Czech Republic", code: "CZE" },
+  { id: "svk", name: "Slovakia", code: "SVK", isoCode: "sk" },
+  { id: "rus", name: "Russia", code: "RUS", isoCode: "ru" },
+  { id: "swe", name: "Sweden", code: "SWE", isoCode: "se" },
+  { id: "cze", name: "Czech Republic", code: "CZE", isoCode: "cz" },
+  { id: "fin", name: "Finland", code: "FIN", isoCode: "fi" },
+  { id: "can", name: "Canada", code: "CAN", isoCode: "ca" },
+  { id: "usa", name: "United States", code: "USA", isoCode: "us" },
 ];
 
 export const games: Game[] = [
-  {
-    id: "g1",
-    tournamentId: "wc-2002",
-    stage: "final",
-    date: "2002-05-12",
-    homeTeamId: "svk",
-    awayTeamId: "rus",
-    homeScore: 4,
-    awayScore: 3,
-  },
-  {
-    id: "g2",
-    tournamentId: "wc-2002",
-    stage: "group",
-    groupName: "A",
-    date: "2002-04-28",
-    homeTeamId: "swe",
-    awayTeamId: "cze",
-    homeScore: 2,
-    awayScore: 5,
-  },
+  // --- 2000, Saint Petersburg ---
+  { id: "g2000-final", tournamentId: "wc-2000", stage: "final", date: "2000-05-14", homeTeamId: "cze", awayTeamId: "svk", homeScore: 5, awayScore: 3 },
+  { id: "g2000-bronze", tournamentId: "wc-2000", stage: "bronze", date: "2000-05-13", homeTeamId: "fin", awayTeamId: "can", homeScore: 2, awayScore: 1 },
+
+  // --- 2001, Hanover ---
+  { id: "g2001-final", tournamentId: "wc-2001", stage: "final", date: "2001-05-13", homeTeamId: "cze", awayTeamId: "fin", homeScore: 3, awayScore: 2, overtime: true },
+
+  // --- 2002, Sweden ---
+  { id: "g1", tournamentId: "wc-2002", stage: "final", date: "2002-05-12", homeTeamId: "svk", awayTeamId: "rus", homeScore: 4, awayScore: 3 },
+  { id: "g2", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-28", homeTeamId: "swe", awayTeamId: "cze", homeScore: 2, awayScore: 5 },
+
+  // --- 2003, Helsinki ---
+  { id: "g2003-final", tournamentId: "wc-2003", stage: "final", date: "2003-05-11", homeTeamId: "can", awayTeamId: "swe", homeScore: 3, awayScore: 2, overtime: true },
+
+  // --- 2004, Prague ---
+  { id: "g2004-final", tournamentId: "wc-2004", stage: "final", date: "2004-05-09", homeTeamId: "can", awayTeamId: "swe", homeScore: 5, awayScore: 3 },
+  { id: "g2004-bronze", tournamentId: "wc-2004", stage: "bronze", date: "2004-05-09", homeTeamId: "usa", awayTeamId: "svk", homeScore: 1, awayScore: 0, overtime: true },
 ];
+
+export const playerStats: PlayerStat[] = []; // intentionally empty — added later
+
+export function getPlayerStats(tournamentId: string, teamId: string) {
+  return playerStats.filter(
+    (p) => p.tournamentId === tournamentId && p.teamId === teamId
+  );
+}
 
 export interface StandingRow {
   teamId: string;
