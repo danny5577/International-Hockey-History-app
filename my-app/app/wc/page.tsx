@@ -6,6 +6,9 @@ export default function WorldChampionshipsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
+      <Link href="/" className="font-mono text-sm text-ice">
+        ← Home
+      </Link>
       <h1 className="mb-8 text-3xl font-bold">World Championships</h1>
       <ul className="flex flex-col gap-3">
         {wcTournaments.map((t) => (
