@@ -30,6 +30,8 @@ export const tournaments: Tournament[] = [
   { id: "wc-2002", type: "WC", year: 2002, host: "Sweden", startDate: "2002-04-27", endDate: "2002-05-12" },
   { id: "wc-2003", type: "WC", year: 2003, host: "Finland", startDate: "2003-04-26", endDate: "2003-05-11" },
   { id: "wc-2004", type: "WC", year: 2004, host: "Czech Republic", startDate: "2004-04-24", endDate: "2004-05-09" },
+  { id: "wc-2007", type: "WC", year: 2007, host: "Russia", startDate: "2007-04-27", endDate: "2007-05-13" },
+
   {
     id: "og-2002",
     type: "OG",
@@ -110,6 +112,15 @@ export const games: Game[] = [
   // --- 2004, Prague ---
   { id: "g2004-final", tournamentId: "wc-2004", stage: "final", date: "2004-05-09", homeTeamId: "can", awayTeamId: "swe", homeScore: 5, awayScore: 3 },
   { id: "g2004-bronze", tournamentId: "wc-2004", stage: "bronze", date: "2004-05-09", homeTeamId: "usa", awayTeamId: "svk", homeScore: 1, awayScore: 0, overtime: true },
+
+  // --- 2007, Russia ---
+  { id: "g2007-groupA1", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-04-28", homeTeamId: "sui", awayTeamId: "lva", homeScore: 2, awayScore: 1 },
+  { id: "g2007-groupA2", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-04-28", homeTeamId: "swe", awayTeamId: "ita", homeScore: 7, awayScore: 1 },
+  { id: "g2007-groupA3", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-04-30", homeTeamId: "sui", awayTeamId: "ita", homeScore: 2, awayScore: 1 },
+  { id: "g2007-groupA4", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-04-30", homeTeamId: "lva", awayTeamId: "swe", homeScore: 2, awayScore: 8 },
+  { id: "g2007-groupA5", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-05-02", homeTeamId: "ita", awayTeamId: "lva", homeScore: 4, awayScore: 3, overtime: true },
+  { id: "g2007-groupA6", tournamentId: "wc-2007", stage: "group", groupName: "A", date: "2007-05-02", homeTeamId: "swe", awayTeamId: "sui", homeScore: 6, awayScore: 0 },
+
 
   // ---2002, Salt Lake City ---
   { id: "og2002-final", tournamentId: "og-2002", stage: "final", date: "2004-02-24", homeTeamId: "usa", awayTeamId: "can", homeScore: 2, awayScore: 5 },
