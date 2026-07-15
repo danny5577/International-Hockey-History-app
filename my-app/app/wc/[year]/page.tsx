@@ -45,6 +45,7 @@ export default async function WcTournamentPage({
 
       <TournamentView
         tournamentId={tournament.id}
+        year = {tournament.year}
         groups={groups}
         playoffGames={playoffGames}
         teams={teamsInTournament}

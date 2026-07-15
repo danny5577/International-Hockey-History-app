@@ -49,3 +49,16 @@ export interface PlayerStat {
   points: number;
   penaltyMinutes: number;
 }
+
+export interface StandingRow {
+  teamId: string;
+  played: number;
+  won: number;
+  otWon: number;
+  otLost: number;
+  draw: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  points: number;
+}

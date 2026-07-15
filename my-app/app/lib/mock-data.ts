@@ -1,4 +1,5 @@
-import { TournamentType, Tournament, Team, Game, PlayerStat } from "./types";
+import { TournamentType, Tournament, Team, Game, PlayerStat, StandingRow } from "./types";
+import { PointSystem } from "./rules";
 
 export function getTournament(type: TournamentType, year: number) {
   return tournaments.find((t) => t.type === type && t.year === year);
@@ -24,7 +25,7 @@ export function getTeamsInTournament(gamesInTournament: Game[]): Team[] {
 }
 
 export const tournaments: Tournament[] = [
-   { id: "wc-2000", type: "WC", year: 2000, host: "Russia", startDate: "2000-04-29", endDate: "2000-05-14" },
+  { id: "wc-2000", type: "WC", year: 2000, host: "Russia", startDate: "2000-04-29", endDate: "2000-05-14" },
   { id: "wc-2001", type: "WC", year: 2001, host: "Germany", startDate: "2001-04-28", endDate: "2001-05-13" },
   { id: "wc-2002", type: "WC", year: 2002, host: "Sweden", startDate: "2002-04-27", endDate: "2002-05-12" },
   { id: "wc-2003", type: "WC", year: 2003, host: "Finland", startDate: "2003-04-26", endDate: "2003-05-11" },
@@ -47,6 +48,16 @@ export const teams: Team[] = [
   { id: "fin", name: "Finland", code: "FIN", isoCode: "fi" },
   { id: "can", name: "Canada", code: "CAN", isoCode: "ca" },
   { id: "usa", name: "United States", code: "USA", isoCode: "us" },
+  { id: "ger", name: "Germany", code: "GER", isoCode: "de" },
+  { id: "sui", name: "Switzerland", code: "SUI", isoCode: "ch" },
+  { id: "jpn", name: "Japan", code: "JPN", isoCode: "jp" },
+  { id: "ukr", name: "Ukraine", code: "UKR", isoCode: "ua" },
+  { id: "pol", name: "Poland", code: "POL", isoCode: "pl" },
+  { id: "aut", name: "Austria", code: "AUT", isoCode: "at" },
+  { id: "svn", name: "Slovenia", code: "SVN", isoCode: "si" },
+  { id: "lva", name: "Latvia", code: "LVA", isoCode: "lv" },
+  { id: "ita", name: "Italy", code: "ITA", isoCode: "it" },
+
 ];
 
 export const games: Game[] = [
@@ -58,8 +69,40 @@ export const games: Game[] = [
   { id: "g2001-final", tournamentId: "wc-2001", stage: "final", date: "2001-05-13", homeTeamId: "cze", awayTeamId: "fin", homeScore: 3, awayScore: 2, overtime: true },
 
   // --- 2002, Sweden ---
-  { id: "g1", tournamentId: "wc-2002", stage: "final", date: "2002-05-12", homeTeamId: "svk", awayTeamId: "rus", homeScore: 4, awayScore: 3 },
-  { id: "g2", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-28", homeTeamId: "swe", awayTeamId: "cze", homeScore: 2, awayScore: 5 },
+
+  { id: "g2002-groupA1", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-26", homeTeamId: "ger", awayTeamId: "jpn", homeScore: 9, awayScore: 2 },
+  { id: "g2002-groupA2", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-26", homeTeamId: "sui", awayTeamId: "cze", homeScore: 0, awayScore: 5 },
+  { id: "g2002-groupA3", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-28", homeTeamId: "ger", awayTeamId: "sui", homeScore: 3, awayScore: 0 },
+  { id: "g2002-groupA4", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-28", homeTeamId: "cze", awayTeamId: "jpn", homeScore: 5, awayScore: 3 },
+  { id: "g2002-groupA5", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-29", homeTeamId: "jpn", awayTeamId: "sui", homeScore: 1, awayScore: 5 },
+  { id: "g2002-groupA6", tournamentId: "wc-2002", stage: "group", groupName: "A", date: "2002-04-29", homeTeamId: "cze", awayTeamId: "ger", homeScore: 7, awayScore: 5 },
+
+  { id: "g2002-groupB1", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-27", homeTeamId: "svk", awayTeamId: "pol", homeScore: 7, awayScore: 0 },
+  { id: "g2002-groupB2", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-27", homeTeamId: "ukr", awayTeamId: "fin", homeScore: 0, awayScore: 3 },
+  { id: "g2002-groupB3", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-29", homeTeamId: "svk", awayTeamId: "ukr", homeScore: 5, awayScore: 3 },
+  { id: "g2002-groupB4", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-29", homeTeamId: "fin", awayTeamId: "pol", homeScore: 8, awayScore: 0 },
+  { id: "g2002-groupB5", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-30", homeTeamId: "fin", awayTeamId: "svk", homeScore: 3, awayScore: 1 },
+  { id: "g2002-groupB6", tournamentId: "wc-2002", stage: "group", groupName: "B", date: "2002-04-30", homeTeamId: "pol", awayTeamId: "ukr", homeScore: 0, awayScore: 3 },
+
+  { id: "g2002-groupC1", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-26", homeTeamId: "rus", awayTeamId: "svn", homeScore: 8, awayScore: 1 },
+  { id: "g2002-groupC2", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-26", homeTeamId: "aut", awayTeamId: "swe", homeScore: 3, awayScore: 5 },
+  { id: "g2002-groupC3", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-28", homeTeamId: "rus", awayTeamId: "aut", homeScore: 6, awayScore: 3 },
+  { id: "g2002-groupC4", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-28", homeTeamId: "swe", awayTeamId: "svn", homeScore: 8, awayScore: 2 },
+  { id: "g2002-groupC5", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-30", homeTeamId: "svn", awayTeamId: "aut", homeScore: 3, awayScore: 5 },
+  { id: "g2002-groupC6", tournamentId: "wc-2002", stage: "group", groupName: "C", date: "2002-04-30", homeTeamId: "swe", awayTeamId: "rus", homeScore: 2, awayScore: 0 },
+
+  { id: "g2002-groupD1", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-27", homeTeamId: "ita", awayTeamId: "usa", homeScore: 2, awayScore: 5 },
+  { id: "g2002-groupD2", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-27", homeTeamId: "can", awayTeamId: "lva", homeScore: 4, awayScore: 1 },
+  { id: "g2002-groupD3", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-29", homeTeamId: "can", awayTeamId: "ita", homeScore: 5, awayScore: 0 },
+  { id: "g2002-groupd4", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-29", homeTeamId: "usa", awayTeamId: "lva", homeScore: 3, awayScore: 2 },
+  { id: "g2002-groupD5", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-30", homeTeamId: "lva", awayTeamId: "ita", homeScore: 4, awayScore: 1 },
+  { id: "g2002-groupD6", tournamentId: "wc-2002", stage: "group", groupName: "D", date: "2002-04-30", homeTeamId: "usa", awayTeamId: "can", homeScore: 1, awayScore: 2 },
+
+
+
+
+
+  { id: "g2002-final", tournamentId: "wc-2002", stage: "final", date: "2002-05-12", homeTeamId: "svk", awayTeamId: "rus", homeScore: 4, awayScore: 3 },
 
   // --- 2003, Helsinki ---
   { id: "g2003-final", tournamentId: "wc-2003", stage: "final", date: "2003-05-11", homeTeamId: "can", awayTeamId: "swe", homeScore: 3, awayScore: 2, overtime: true },
@@ -81,19 +124,7 @@ export function getPlayerStats(tournamentId: string, teamId: string) {
   );
 }
 
-export interface StandingRow {
-  teamId: string;
-  played: number;
-  won: number;
-  otWon: number;
-  otLost: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  points: number;
-}
-
-export function computeStandings(gamesInGroup: Game[]): StandingRow[] {
+export function computeStandings(gamesInGroup: Game[], pointSystem: PointSystem): StandingRow[] {
   const table: Record<string, StandingRow> = {};
 
   function row(teamId: string): StandingRow {
@@ -104,6 +135,7 @@ export function computeStandings(gamesInGroup: Game[]): StandingRow[] {
         won: 0,
         otWon: 0,
         otLost: 0,
+        draw: 0,
         lost: 0,
         goalsFor: 0,
         goalsAgainst: 0,
@@ -123,6 +155,15 @@ export function computeStandings(gamesInGroup: Game[]): StandingRow[] {
     home.goalsAgainst += game.awayScore;
     away.goalsFor += game.awayScore;
     away.goalsAgainst += game.homeScore;
+
+     if (game.homeScore === game.awayScore) {
+      // draw — only occurs pre-2007
+      home.draw += 1;
+      away.draw += 1;
+      home.points += pointSystem.draw;
+      away.points += pointSystem.draw;
+      continue;
+    }
 
     const homeWon = game.homeScore > game.awayScore;
     const winner = homeWon ? home : away;

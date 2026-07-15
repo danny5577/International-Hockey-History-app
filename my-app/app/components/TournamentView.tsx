@@ -8,18 +8,24 @@ import { computeStandings, getTeam } from "@/app/lib/mock-data";
 import { GameRow } from "./GameRow";
 import { StandingsTable } from "./StandingsTable";
 import { isoToFlagEmoji } from "../lib/flags";
+import { getPointSystem, usesDrawFormat } from "../lib/rules";
 
 export function TournamentView({
   tournamentId,
+  year,
   groups,
   playoffGames,
   teams,
 }: {
   tournamentId: string;
+  year: number,
   groups: Record<string, Game[]>;
   playoffGames: Game[];
   teams: Team[];
 }) {
+  const pointsSystem = getPointSystem(year);
+  const drawFormat = usesDrawFormat(year);
+
   const [selectedTeamId, setSelectedTeamId] = useState<string>("all");
 
   const allGames = [...Object.values(groups).flat(), ...playoffGames];
@@ -73,7 +79,8 @@ export function TournamentView({
               <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
                 Group {groupName}
               </h2>
-              <StandingsTable rows={computeStandings(gamesInGroup)} />
+              <StandingsTable rows={computeStandings(gamesInGroup, pointsSystem)}
+              allowsDraws = {drawFormat} />
               <div className="flex flex-col gap-2">
                 {gamesInGroup.map((g) => (
                   <GameRow key={g.id} game={g} />
