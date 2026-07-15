@@ -47,6 +47,7 @@ export default async function OlympicsTournamentPage({
 
      <TournamentView
         tournamentId={tournament.id}
+        year = {tournament.year}
         groups={groups}
         playoffGames={playoffGames}
         teams={teamsInTournament}
