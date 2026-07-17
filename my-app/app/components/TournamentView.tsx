@@ -1,14 +1,13 @@
 "use client";
 
-import { getPlayerStats } from "@/app/lib/mock-data";
 import { RosterTable } from "./RosterTable";
-import { useState } from "react";
-import { Game, Team } from "@/app/lib/types";
-import { computeStandings, getTeam } from "@/app/lib/mock-data";
+import { useMemo, useState } from "react";
+import { Game, Team, PlayerStat } from "@/app/lib/types";
 import { GameRow } from "./GameRow";
 import { StandingsTable } from "./StandingsTable";
 import { isoToFlagEmoji } from "../lib/flags";
 import { getPointSystem, usesDrawFormat } from "../lib/rules";
+import { computeStandings } from "../lib/standings";
 
 export function TournamentView({
   tournamentId,
@@ -16,15 +15,19 @@ export function TournamentView({
   groups,
   playoffGames,
   teams,
+  playerStats,
 }: {
   tournamentId: string;
   year: number,
   groups: Record<string, Game[]>;
   playoffGames: Game[];
   teams: Team[];
+  playerStats: PlayerStat[];
 }) {
-  const pointsSystem = getPointSystem(year);
+
+  const pointSystem = getPointSystem(year);
   const drawFormat = usesDrawFormat(year);
+  const teamsById = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
 
   const [selectedTeamId, setSelectedTeamId] = useState<string>("all");
 
@@ -32,11 +35,11 @@ export function TournamentView({
   const filteredGames =
     selectedTeamId === "all"
       ? null
-      : allGames.filter(
-          (g) =>
-            g.homeTeamId === selectedTeamId || g.awayTeamId === selectedTeamId
-        );
-
+      : allGames.filter
+      ((g) => g.homeTeamId === selectedTeamId || g.awayTeamId === selectedTeamId);
+      
+  const statsForSelectedTeam = playerStats.filter((p) => p.teamId === selectedTeamId);
+      
   return (
     <div>
       <div className="mb-8">
@@ -60,17 +63,17 @@ export function TournamentView({
       {filteredGames ? (
         <section>
           <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
-            {getTeam(selectedTeamId)?.name}&apos;s games
+            {teamsById.get(selectedTeamId)?.name}&apos;s games
           </h2>
           <div className="flex flex-col gap-2">
-            {filteredGames.map((g) => (
-              <GameRow key={g.id} game={g} />
+             {filteredGames.map((g) => (
+              <GameRow key={g.id} game={g} teams={teamsById} />
             ))}
           </div>
            <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
             Roster &amp; Stats
           </h2>
-          <RosterTable stats={getPlayerStats(tournamentId, selectedTeamId)} />
+          <RosterTable stats={statsForSelectedTeam} />
         </section>
       ) : (
         <>
@@ -79,11 +82,14 @@ export function TournamentView({
               <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
                 Group {groupName}
               </h2>
-              <StandingsTable rows={computeStandings(gamesInGroup, pointsSystem)}
-              allowsDraws = {drawFormat} />
+              <StandingsTable
+              rows={computeStandings(gamesInGroup, pointSystem)}
+              allowsDraws = {drawFormat}
+              teams={teamsById}
+              />
               <div className="flex flex-col gap-2">
                 {gamesInGroup.map((g) => (
-                  <GameRow key={g.id} game={g} />
+                  <GameRow key={g.id} game={g} teams={teamsById} />
                 ))}
               </div>
             </section>
@@ -96,7 +102,7 @@ export function TournamentView({
               </h2>
               <div className="flex flex-col gap-2">
                 {playoffGames.map((g) => (
-                  <GameRow key={g.id} game={g} />
+                  <GameRow key={g.id} game={g} teams={teamsById} />
                 ))}
               </div>
             </section>

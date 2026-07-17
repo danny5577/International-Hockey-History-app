@@ -1,10 +1,9 @@
-import { getTeam } from "../lib/mock-data";
-import { Game } from "../lib/types";
+import { Game , Team} from "../lib/types";
 import { Flag } from "./Flag";
 
-export function GameRow({ game }: { game: Game }) {
-  const home = getTeam(game.homeTeamId);
-  const away = getTeam(game.awayTeamId);
+export function GameRow({ game, teams }: { game: Game; teams: Map<string, Team> }) {
+  const home = teams.get(game.homeTeamId);
+  const away = teams.get(game.awayTeamId);
   const homeWon = game.homeScore > game.awayScore;
   const awayWon = game.awayScore > game.homeScore;
 

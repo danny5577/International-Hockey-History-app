@@ -17,6 +17,12 @@ export const gameStageEnum = pgEnum("game_stage", [
   "relegation",
 ]);
 
+//---better solution to a playerPosition type error fix , it requires drizzle database reseeding tho
+/*export const playerPositionEnum = pgEnum("player_position", ["F", "D", "G"]);
+
+// in the playerStats table definition:
+position: playerPositionEnum("position"),*/
+
 export const tournaments = pgTable("tournaments", {
   id: text("id").primaryKey(),
   type: tournamentTypeEnum("type").notNull(),

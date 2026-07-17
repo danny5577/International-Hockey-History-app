@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTournament, getGamesForTournament, getTeamsInTournament } from "@/app/lib/mock-data";
-import { GameRow } from "@/app/components/GameRow";
+import {
+    getTournament,
+    getGamesForTournament,
+    getTeamsForGames,
+    getPlayerStatsForTournament
+        } from "@/app/lib/db/queries";
 import { Game } from "@/app/lib/types";
 import { TournamentView } from "@/app/components/TournamentView";
 
@@ -11,16 +15,21 @@ export default async function WcTournamentPage({
   params: Promise<{ year: string }>;
 }) {
   const { year } = await params;
-  const tournament = getTournament("WC", Number(year));
+  const tournament = await getTournament("WC", Number(year));
 
   if (!tournament) {
     notFound();
   }
 
-  const allGames = getGamesForTournament(tournament.id);
+   const [allGames, playerStats] = await Promise.all([
+    getGamesForTournament(tournament.id),
+    getPlayerStatsForTournament(tournament.id),
+  ]);
+
+  const teamsInTournament = await getTeamsForGames(allGames);
+
   const groupGames = allGames.filter((g) => g.stage === "group");
   const playoffGames = allGames.filter((g) => g.stage !== "group");
-  const teamsInTournament = getTeamsInTournament(allGames);
 
   // group the group-stage games by their groupName ("A", "B", ...)
   const groups = groupGames.reduce<Record<string, Game[]>>((acc, game) => {
@@ -49,6 +58,7 @@ export default async function WcTournamentPage({
         groups={groups}
         playoffGames={playoffGames}
         teams={teamsInTournament}
+        playerStats={playerStats}
       />
     </div>
   );

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { tournaments } from "../lib/mock-data";
+import { getTournamentsByType } from "../lib/db/queries";
 
-export default function OlympicsPage() {
-  const wcTournaments = tournaments.filter((t) => t.type === "OG");
+export default async function OlympicsPage() {
+  const wcTournaments = await getTournamentsByType("OG")
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">

@@ -1,8 +1,9 @@
-import { getTeam } from "@/app/lib/mock-data";
 import { Flag } from "./Flag";
-import { StandingRow } from "../lib/types";
+import { Team, StandingRow } from "../lib/types";
 
-export function StandingsTable({ rows, allowsDraws }: { rows: StandingRow[], allowsDraws: boolean }) {
+export function StandingsTable(
+  { rows, allowsDraws, teams }:
+  { rows: StandingRow[]; allowsDraws: boolean; teams: Map<string, Team> }) {
   return (
     <table className="mb-4 w-full border-collapse font-mono text-sm">
       <thead>
@@ -26,7 +27,7 @@ export function StandingsTable({ rows, allowsDraws }: { rows: StandingRow[], all
       </thead>
       <tbody>
         {rows.map((r) => {
-          const team = getTeam(r.teamId);
+          const team = teams.get(r.teamId);
           return (
             <tr key={r.teamId} className="border-t border-white/10">
               <td className="py-2 flex items-center gap-1.5">
