@@ -5,6 +5,7 @@ import {
   boolean,
   varchar,
   pgEnum,
+  timestamp,
 } from "drizzle-orm/pg-core";
 
 export const tournamentTypeEnum = pgEnum("tournament_type", ["WC", "OG"]);
@@ -17,11 +18,12 @@ export const gameStageEnum = pgEnum("game_stage", [
   "relegation",
 ]);
 
-//---better solution to a playerPosition type error fix , it requires drizzle database reseeding tho
-/*export const playerPositionEnum = pgEnum("player_position", ["F", "D", "G"]);
-
-// in the playerStats table definition:
-position: playerPositionEnum("position"),*/
+export const users = pgTable("users", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 export const tournaments = pgTable("tournaments", {
   id: text("id").primaryKey(),
@@ -51,6 +53,12 @@ export const games = pgTable("games", {
   awayScore: integer("away_score").notNull(),
   overtime: boolean("overtime").notNull().default(false),
 });
+
+//---better solution to a playerPosition type error fix , it requires drizzle database reseeding tho
+/*export const playerPositionEnum = pgEnum("player_position", ["F", "D", "G"]);
+
+// in the playerStats table definition:
+position: playerPositionEnum("position"),*/
 
 export const playerStats = pgTable("player_stats", {
   id: text("id").primaryKey(),
