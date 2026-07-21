@@ -32,7 +32,7 @@ export default async function LoginPage({
         />
         <button
           type="submit"
-          className="rounded-lg bg-ice px-3 py-2 font-mono text-sm font-semibold text-background"
+          className="rounded-lg bg-ice hover:bg-blue-400 px-3 py-2 font-mono text-sm font-semibold text-background"
         >
           Sign in
         </button>

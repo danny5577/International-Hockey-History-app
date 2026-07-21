@@ -60,3 +60,18 @@ export async function getPlayerStatsForTournament(tournamentId: string) {
     position: (p.position ?? undefined) as PlayerStat["position"],
   }));
 }
+
+export async function insertTournament(data: {
+  id: string;
+  type: TournamentType;
+  year: number;
+  host: string;
+  startDate: string;
+  endDate: string;
+}) {
+  await db.insert(tournaments).values(data);
+}
+
+export async function getAllTournaments() {
+  return db.select().from(tournaments).orderBy(tournaments.type, tournaments.year);
+}
