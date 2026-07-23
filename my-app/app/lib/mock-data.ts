@@ -35,6 +35,15 @@ export const teams: Team[] = [
   { id: "svn", name: "Slovenia", code: "SVN", isoCode: "si" },
   { id: "lva", name: "Latvia", code: "LVA", isoCode: "lv" },
   { id: "ita", name: "Italy", code: "ITA", isoCode: "it" },
+  { id: "blr", name: "Belarus", code: "BLR", isoCode: "by" },
+  { id: "den", name: "Denmark", code: "DEN", isoCode: "dk" },
+  { id: "nor", name: "Norway", code: "NOR", isoCode: "no" },
+  { id: "fra", name: "France", code: "FRA", isoCode: "fr" },
+  { id: "kaz", name: "Kazakhstan", code: "KAZ", isoCode: "kz" },
+  { id: "hun", name: "Hungary", code: "HUN", isoCode: "hu" },
+  { id: "gbr", name: "Great Britain", code: "GBR", isoCode: "gb" },
+  { id: "kor", name: "South Korea", code: "KOR", isoCode: "kr" },
+  { id: "chn", name: "China", code: "CHN", isoCode: "cn" },
 
 ];
 
