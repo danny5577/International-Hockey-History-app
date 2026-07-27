@@ -4,7 +4,8 @@ import {
     getTournament,
     getGamesForTournament,
     getTeamsForGames,
-    getPlayerStatsForTournament
+    getPlayerStatsForTournament,
+    getGroupsForTournament
         } from "@/app/lib/db/queries";
 import { Game } from "@/app/lib/types";
 import { TournamentView } from "@/app/components/TournamentView";
@@ -27,13 +28,14 @@ export default async function WcTournamentPage({
   ]);
 
   const teamsInTournament = await getTeamsForGames(allGames);
+  const tournamentGroupRows = await getGroupsForTournament(tournament.id);
 
   const groupGames = allGames.filter((g) => g.stage === "group");
   const playoffGames = allGames.filter((g) => g.stage !== "group");
 
   // group the group-stage games by their groupName ("A", "B", ...)
   const groups = groupGames.reduce<Record<string, Game[]>>((acc, game) => {
-    const key = game.groupName ?? "Unknown";
+    const key = game.groupId ?? "Unknown";
     acc[key] = acc[key] ?? [];
     acc[key].push(game);
     return acc;
@@ -56,6 +58,7 @@ export default async function WcTournamentPage({
         tournamentId={tournament.id}
         year = {tournament.year}
         groups={groups}
+        groupNames={tournamentGroupRows}
         playoffGames={playoffGames}
         teams={teamsInTournament}
         playerStats={playerStats}

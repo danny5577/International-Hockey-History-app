@@ -2,7 +2,7 @@
 
 import { RosterTable } from "./RosterTable";
 import { useMemo, useState } from "react";
-import { Game, Team, PlayerStat } from "@/app/lib/types";
+import { Game, Team, PlayerStat, TournamentGroup } from "@/app/lib/types";
 import { GameRow } from "./GameRow";
 import { StandingsTable } from "./StandingsTable";
 import { isoToFlagEmoji } from "../lib/flags";
@@ -13,6 +13,7 @@ export function TournamentView({
   tournamentId,
   year,
   groups,
+  groupNames,
   playoffGames,
   teams,
   playerStats,
@@ -20,6 +21,7 @@ export function TournamentView({
   tournamentId: string;
   year: number,
   groups: Record<string, Game[]>;
+  groupNames: TournamentGroup[];
   playoffGames: Game[];
   teams: Team[];
   playerStats: PlayerStat[];
@@ -39,6 +41,10 @@ export function TournamentView({
       ((g) => g.homeTeamId === selectedTeamId || g.awayTeamId === selectedTeamId);
       
   const statsForSelectedTeam = playerStats.filter((p) => p.teamId === selectedTeamId);
+
+  const groupNameById = useMemo(
+    () => new Map(groupNames.map((g) => [g.id, g.name])),[groupNames]);
+
       
   return (
     <div>
@@ -77,10 +83,10 @@ export function TournamentView({
         </section>
       ) : (
         <>
-          {Object.entries(groups).map(([groupName, gamesInGroup]) => (
-            <section key={groupName} className="mb-10">
+          {Object.entries(groups).map(([groupId, gamesInGroup]) => (
+            <section key={groupId} className="mb-10">
               <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
-                Group {groupName}
+                Group {groupNameById.get(groupId) ?? "?"}
               </h2>
               <StandingsTable
               rows={computeStandings(gamesInGroup, pointSystem)}

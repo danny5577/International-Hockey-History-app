@@ -1,6 +1,6 @@
 import { eq, and, inArray } from "drizzle-orm";
 import { db } from "./index";
-import { tournaments, teams, games, playerStats } from "./schema";
+import { tournaments, teams, games, playerStats , tournamentGroups, groupTeams} from "./schema";
 import { TournamentType, PlayerStat } from "@/app/lib/types";
 
 export async function getTournament(type: TournamentType, year: number) {
@@ -26,7 +26,30 @@ export async function getGamesForTournament(tournamentId: string) {
     .where(eq(games.tournamentId, tournamentId));
 
   // DB uses null for "no group"; our Game type uses undefined — reconcile here
-  return rows.map((g) => ({ ...g, groupName: g.groupName ?? undefined }));
+  return rows.map((g) => ({ ...g, groupId: g.groupId ?? undefined }));
+}
+
+export async function getGroupsForTournament(tournamentId: string) {
+  return db.select().from(tournamentGroups).where(eq(tournamentGroups.tournamentId, tournamentId));
+}
+
+export async function getGroupsWithTeams(tournamentId: string) {
+  const groupRows = await getGroupsForTournament(tournamentId);
+  const result = [];
+  for (const group of groupRows) {
+    const teamRows = await db
+      .select({ team: teams })
+      .from(groupTeams)
+      .innerJoin(teams, eq(groupTeams.teamId, teams.id))
+      .where(eq(groupTeams.groupId, group.id));
+    result.push({ ...group, teams: teamRows.map((r) => r.team) });
+  }
+  return result;
+}
+
+export async function getTournamentById(id: string) {
+  const rows = await db.select().from(tournaments).where(eq(tournaments.id, id));
+  return rows[0];
 }
 
 // One query for every team that appears in a set of games — this is the

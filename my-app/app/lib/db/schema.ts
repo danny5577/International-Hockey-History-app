@@ -45,7 +45,7 @@ export const games = pgTable("games", {
   id: text("id").primaryKey(),
   tournamentId: text("tournament_id").notNull().references(() => tournaments.id),
   stage: gameStageEnum("stage").notNull(),
-  groupName: text("group_name"),
+  groupId: text("group_id").references(() => tournamentGroups.id),
   date: text("date").notNull(),
   homeTeamId: text("home_team_id").notNull().references(() => teams.id),
   awayTeamId: text("away_team_id").notNull().references(() => teams.id),
@@ -71,4 +71,16 @@ export const playerStats = pgTable("player_stats", {
   assists: integer("assists").notNull().default(0),
   points: integer("points").notNull().default(0),
   penaltyMinutes: integer("penalty_minutes").notNull().default(0),
+});
+
+export const tournamentGroups = pgTable("tournament_groups", {
+  id: text("id").primaryKey(),
+  tournamentId: text("tournament_id").notNull().references(() => tournaments.id),
+  name: text("name").notNull(), // "A", "B", ...
+});
+
+export const groupTeams = pgTable("group_teams", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  groupId: text("group_id").notNull().references(() => tournamentGroups.id),
+  teamId: text("team_id").notNull().references(() => teams.id),
 });

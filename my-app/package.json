@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx app/scripts/seed.ts",
-    "db:create-admin": "tsx app/scripts/create-admin.ts"
+    "db:create-admin": "tsx app/scripts/create-admin.ts",
+    "db:migrate-groups": "tsx app/scripts/migrate-groups.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

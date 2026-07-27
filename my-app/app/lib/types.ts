@@ -28,13 +28,19 @@ export interface Game {
   id: string;
   tournamentId: string;
   stage: GameStage;
-  groupName?: string;    // "A", "B" — only set when stage is "group"
+  groupId?: string;    // "A", "B" — only set when stage is "group"
   date: string;
   homeTeamId: string;
   awayTeamId: string;
   homeScore: number;
   awayScore: number;
   overtime?: boolean;
+}
+
+export interface TournamentGroup {
+  id: string;
+  tournamentId: string;
+  name: string;
 }
 
 export interface PlayerStat {

@@ -38,9 +38,13 @@ export default async function AdminPage() {
 
       <ul className="flex flex-col gap-2">
         {allTournaments.map((t) => (
-          <li key={t.id} className="rounded-lg bg-surface p-4 font-mono text-sm">
-            {t.type} {t.year} — hosted by {t.host}
-          </li>
+      <Link
+        key={t.id}
+        href={`/admin/tournaments/${t.id}`}
+        className="block rounded-lg bg-surface p-4 font-mono text-sm hover:bg-[#1a2540]"
+>
+        {t.type} {t.year} — hosted by {t.host}
+      </Link>
         ))}
       </ul>
     </div>
