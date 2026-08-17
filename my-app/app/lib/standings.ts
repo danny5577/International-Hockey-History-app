@@ -1,7 +1,11 @@
 import { Game, StandingRow } from "./types";
 import { PointSystem } from "./rules";
 
-export function computeStandings(gamesInGroup: Game[], pointSystem: PointSystem): StandingRow[] {
+export function computeStandings(gamesInGroup: Game[],
+                                 pointSystem: PointSystem,
+                                 teamIds: string[] = []):
+                                 StandingRow[] {
+
   const table: Record<string, StandingRow> = {};
 
   function row(teamId: string): StandingRow {
@@ -21,6 +25,8 @@ export function computeStandings(gamesInGroup: Game[], pointSystem: PointSystem)
     }
     return table[teamId];
   }
+
+  for (const id of teamIds) row(id);
 
   for (const game of gamesInGroup) {
     const home = row(game.homeTeamId);

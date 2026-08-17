@@ -5,9 +5,12 @@ import {
   getGroupsWithTeams,
   getGamesForTournament,
   getTeamsForGames,
+  getAllTeams
 } from "@/app/lib/db/queries";
 import { Flag } from "@/app/components/Flag";
 import { GameRow } from "@/app/components/GameRow";
+import { AddGroupForm } from "@/app/components/admin/AddGroupForm";
+import { AssignTeamForm } from "@/app/components/admin/AssignTeamForm";
 
 export default async function AdminTournamentPage({
   params,
@@ -16,6 +19,7 @@ export default async function AdminTournamentPage({
 }) {
   const { id } = await params;
   const tournament = await getTournamentById(id);
+  const allTeams = await getAllTeams();
   if (!tournament) notFound();
 
   const [groupsWithTeams, allGames] = await Promise.all([
@@ -35,33 +39,34 @@ export default async function AdminTournamentPage({
         Hosted by {tournament.host} · {tournament.startDate} to {tournament.endDate}
       </p>
 
-      <section className="mb-10">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-mono text-sm uppercase tracking-widest text-ice">Groups</h2>
-          <span className="font-mono text-xs text-muted">Add group — next step</span>
-        </div>
-        {groupsWithTeams.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-white/10 p-4 font-mono text-sm text-muted">
-            No groups yet.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {groupsWithTeams.map((g) => (
-              <div key={g.id} className="rounded-lg bg-surface p-4">
-                <p className="mb-2 font-mono text-sm text-ice">Group {g.name}</p>
-                <div className="flex flex-wrap gap-3">
-                  {g.teams.map((t) => (
-                    <span key={t.id} className="flex items-center gap-1 font-mono text-xs text-muted">
-                      <Flag isoCode={t.isoCode} label={t.name} />
-                      {t.code}
-                    </span>
-                  ))}
-                </div>
-              </div>
+  
+  <section className="mb-10">
+  <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">Groups</h2>
+
+  <div className="mb-4 flex flex-col gap-3">
+    {groupsWithTeams.map((g) => {
+      const assignedIds = new Set(g.teams.map((t) => t.id));
+      const availableTeams = allTeams.filter((t) => !assignedIds.has(t.id));
+
+      return (
+        <div key={g.id} className="rounded-lg bg-surface p-4">
+          <p className="mb-2 font-mono text-sm text-ice">Group {g.name}</p>
+          <div className="mb-3 flex flex-wrap gap-3">
+            {g.teams.map((t) => (
+              <span key={t.id} className="flex items-center gap-1 font-mono text-xs text-muted">
+                <Flag isoCode={t.isoCode} label={t.name} />
+                {t.code}
+              </span>
             ))}
           </div>
-        )}
-      </section>
+          <AssignTeamForm groupId={g.id} availableTeams={availableTeams} />
+        </div>
+      );
+    })}
+  </div>
+
+  <AddGroupForm tournamentId={tournament.id} />
+</section>
 
       <section className="mb-10">
         <div className="mb-3 flex items-center justify-between">

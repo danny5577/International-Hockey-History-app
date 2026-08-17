@@ -68,3 +68,7 @@ export interface StandingRow {
   goalsAgainst: number;
   points: number;
 }
+
+export interface GroupWithTeams extends TournamentGroup {
+  teams: Team[];
+}

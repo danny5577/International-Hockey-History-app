@@ -2,7 +2,7 @@
 
 import { RosterTable } from "./RosterTable";
 import { useMemo, useState } from "react";
-import { Game, Team, PlayerStat, TournamentGroup } from "@/app/lib/types";
+import { Game, Team, PlayerStat, TournamentGroup, GroupWithTeams} from "@/app/lib/types";
 import { GameRow } from "./GameRow";
 import { StandingsTable } from "./StandingsTable";
 import { isoToFlagEmoji } from "../lib/flags";
@@ -10,18 +10,16 @@ import { getPointSystem, usesDrawFormat } from "../lib/rules";
 import { computeStandings } from "../lib/standings";
 
 export function TournamentView({
-  tournamentId,
   year,
   groups,
-  groupNames,
+  groupsMeta,
   playoffGames,
   teams,
   playerStats,
 }: {
-  tournamentId: string;
   year: number,
   groups: Record<string, Game[]>;
-  groupNames: TournamentGroup[];
+  groupsMeta: GroupWithTeams[];
   playoffGames: Game[];
   teams: Team[];
   playerStats: PlayerStat[];
@@ -42,8 +40,8 @@ export function TournamentView({
       
   const statsForSelectedTeam = playerStats.filter((p) => p.teamId === selectedTeamId);
 
-  const groupNameById = useMemo(
-    () => new Map(groupNames.map((g) => [g.id, g.name])),[groupNames]);
+  const groupsMetaById = useMemo(() => new Map(groupsMeta.map((g) => [g.id, g])), [groupsMeta]);
+
 
       
   return (
@@ -83,23 +81,32 @@ export function TournamentView({
         </section>
       ) : (
         <>
-          {Object.entries(groups).map(([groupId, gamesInGroup]) => (
-            <section key={groupId} className="mb-10">
-              <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
-                Group {groupNameById.get(groupId) ?? "?"}
-              </h2>
-              <StandingsTable
-              rows={computeStandings(gamesInGroup, pointSystem)}
-              allowsDraws = {drawFormat}
-              teams={teamsById}
-              />
-              <div className="flex flex-col gap-2">
-                {gamesInGroup.map((g) => (
-                  <GameRow key={g.id} game={g} teams={teamsById} />
-                ))}
-              </div>
-            </section>
-          ))}
+          {Object.entries(groups).map(([groupId, gamesInGroup]) => {
+    const meta = groupsMetaById.get(groupId);
+    return (
+      <section key={groupId} className="mb-10">
+        <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">
+          Group {meta?.name ?? "?"}
+        </h2>
+        <StandingsTable
+          rows={computeStandings(gamesInGroup, pointSystem, meta?.teams.map((t) => t.id) ?? [])}
+          allowsDraws={drawFormat}
+          teams={teamsById}
+        />
+        {gamesInGroup.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-white/10 p-4 font-mono text-sm text-muted">
+            No games played yet.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {gamesInGroup.map((g) => (
+              <GameRow key={g.id} game={g} teams={teamsById} />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  })}
 
           {playoffGames.length > 0 && (
             <section>

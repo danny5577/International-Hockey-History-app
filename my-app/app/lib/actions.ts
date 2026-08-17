@@ -5,7 +5,7 @@ import { signIn } from "@/app/lib/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/lib/auth";
-import { insertTournament } from "./db/queries";
+import { insertTournament, insertGroup, insertGroupTeam, getGroupById, isTeamInGroup } from "./db/queries";
 import { revalidatePath } from "next/cache";
 
 export async function authenticate(formData: FormData) {
@@ -42,6 +42,7 @@ export type TournamentFormState = {
   };
 };
 
+
 export async function createTournament(
   prevState: TournamentFormState,
   formData: FormData
@@ -77,4 +78,64 @@ export async function createTournament(
   revalidatePath("/admin");
   revalidatePath(type === "WC" ? "/wc" : "/olympics");
   redirect("/admin");
+}
+
+
+
+//create group action
+const groupSchema = z.object({
+  name: z.string().min(1, "Required").max(2, "Use a short label, e.g. A"),
+});
+
+export type GroupFormState = { errors?: { name?: string[]; _form?: string[] } };
+
+export async function createGroup(
+  tournamentId: string,
+  prevState: GroupFormState,
+  formData: FormData
+): Promise<GroupFormState> {
+  const session = await auth();
+  if (!session?.user) return { errors: { _form: ["Not authorized."] } };
+
+  const parsed = groupSchema.safeParse({ name: formData.get("name") });
+  if (!parsed.success) return { errors: z.flattenError(parsed.error).fieldErrors };
+
+  const id = `${tournamentId}-${parsed.data.name}`;
+  try {
+    await insertGroup({ id, tournamentId, name: parsed.data.name });
+  } catch {
+    return { errors: { _form: ["A group with this name already exists."] } };
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  return {};
+}
+
+const assignTeamSchema = z.object({
+  teamId: z.string().min(1, "Select a team"),
+});
+
+export type AssignTeamFormState = { errors?: { teamId?: string[]; _form?: string[] } };
+
+export async function assignTeamToGroup(
+  groupId: string,
+  prevState: AssignTeamFormState,
+  formData: FormData
+): Promise<AssignTeamFormState> {
+  const session = await auth();
+  if (!session?.user) return { errors: { _form: ["Not authorized."] } };
+
+  const parsed = assignTeamSchema.safeParse({ teamId: formData.get("teamId") });
+  if (!parsed.success) return { errors: z.flattenError(parsed.error).fieldErrors };
+
+  const group = await getGroupById(groupId);
+  if (!group) return { errors: { _form: ["Group not found."] } };
+
+  if (await isTeamInGroup(groupId, parsed.data.teamId)) {
+    return { errors: { _form: ["This team is already in the group."] } };
+  }
+
+  await insertGroupTeam(groupId, parsed.data.teamId);
+  revalidatePath(`/admin/tournaments/${group.tournamentId}`);
+  return {};
 }

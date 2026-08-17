@@ -55,7 +55,6 @@ export default async function OlympicsTournamentPage({
       </p>
 
      <TournamentView
-        tournamentId={tournament.id}
         year = {tournament.year}
         groups={groups}
         groupNames={tournamentGroupRows}

@@ -1,4 +1,4 @@
-import { Tournament, Team, Game, PlayerStat } from "./types";
+import { Tournament, Team, PlayerStat } from "./types";
 
 export const tournaments: Tournament[] = [
   { id: "wc-2000", type: "WC", year: 2000, host: "Russia", startDate: "2000-04-29", endDate: "2000-05-14" },

@@ -98,3 +98,28 @@ export async function insertTournament(data: {
 export async function getAllTournaments() {
   return db.select().from(tournaments).orderBy(tournaments.type, tournaments.year);
 }
+
+export async function getAllTeams() {
+  return db.select().from(teams).orderBy(teams.name);
+}
+
+export async function getGroupById(groupId: string) {
+  const rows = await db.select().from(tournamentGroups).where(eq(tournamentGroups.id, groupId));
+  return rows[0];
+}
+
+export async function insertGroup(data: { id: string; tournamentId: string; name: string }) {
+  await db.insert(tournamentGroups).values(data);
+}
+
+export async function isTeamInGroup(groupId: string, teamId: string) {
+  const rows = await db
+    .select()
+    .from(groupTeams)
+    .where(and(eq(groupTeams.groupId, groupId), eq(groupTeams.teamId, teamId)));
+  return rows.length > 0;
+}
+
+export async function insertGroupTeam(groupId: string, teamId: string) {
+  await db.insert(groupTeams).values({ groupId, teamId });
+}
