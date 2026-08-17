@@ -5,10 +5,9 @@ import {
     getGamesForTournament,
     getTeamsForGames,
     getPlayerStatsForTournament,
-    getGroupsForTournament,
     getGroupsWithTeams
         } from "@/app/lib/db/queries";
-import { Game } from "@/app/lib/types";
+import { Game, Team} from "@/app/lib/types";
 import { TournamentView } from "@/app/components/TournamentView";
 
 export default async function OlympicsTournamentPage({

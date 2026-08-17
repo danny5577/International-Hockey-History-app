@@ -2,7 +2,7 @@
 
 import { RosterTable } from "./RosterTable";
 import { useMemo, useState } from "react";
-import { Game, Team, PlayerStat, TournamentGroup, GroupWithTeams} from "@/app/lib/types";
+import { Game, Team, PlayerStat, GroupWithTeams} from "@/app/lib/types";
 import { GameRow } from "./GameRow";
 import { StandingsTable } from "./StandingsTable";
 import { isoToFlagEmoji } from "../lib/flags";
