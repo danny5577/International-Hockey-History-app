@@ -3,11 +3,11 @@ import Link from "next/link";
 import {
     getTournament,
     getGamesForTournament,
-    getTeamsForGames,
     getPlayerStatsForTournament,
-    getGroupsWithTeams
+    getGroupsWithTeams,
+    getTeamsForTournament
         } from "@/app/lib/db/queries";
-import { Game, Team } from "@/app/lib/types";
+import { Game } from "@/app/lib/types";
 import { TournamentView } from "@/app/components/TournamentView";
 
 export default async function WcTournamentPage({
@@ -44,14 +44,8 @@ for (const game of groupGames) {
 }
 
 // teams in tournament = union of "assigned to a group" and "appears in a game"
-const teamsMap = new Map<string, Team>();
-for (const g of groupsWithTeams) {
-  for (const t of g.teams) teamsMap.set(t.id, t);
-}
-for (const t of await getTeamsForGames(allGames)) {
-  teamsMap.set(t.id, t);
-}
-const teamsInTournament = [...teamsMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+
+const teamsInTournament = await getTeamsForTournament(tournament.id);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">

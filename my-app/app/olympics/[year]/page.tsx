@@ -3,11 +3,11 @@ import Link from "next/link";
 import {
     getTournament,
     getGamesForTournament,
-    getTeamsForGames,
     getPlayerStatsForTournament,
-    getGroupsWithTeams
+    getGroupsWithTeams,
+    getTeamsForTournament
         } from "@/app/lib/db/queries";
-import { Game, Team} from "@/app/lib/types";
+import { Game} from "@/app/lib/types";
 import { TournamentView } from "@/app/components/TournamentView";
 
 export default async function OlympicsTournamentPage({
@@ -42,14 +42,8 @@ for (const game of groupGames) {
   groups[key].push(game);
 }
 
-const teamsMap = new Map<string, Team>();
-for (const g of groupsWithTeams) {
-  for (const t of g.teams) teamsMap.set(t.id, t);
-}
-for (const t of await getTeamsForGames(allGames)) {
-  teamsMap.set(t.id, t);
-}
-const teamsInTournament = [...teamsMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+const teamsInTournament = await getTeamsForTournament(tournament.id);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <Link href="/wc" className="font-mono text-sm text-ice">
@@ -57,7 +51,7 @@ const teamsInTournament = [...teamsMap.values()].sort((a, b) => a.name.localeCom
       </Link>
 
       <h1 className="mt-4 mb-1 text-3xl font-bold">
-        Olympic gmes {tournament.year}
+        Olympic games {tournament.year}
       </h1>
       <p className="mb-10 text-muted">
         Hosted by {tournament.host} · {tournament.startDate} to {tournament.endDate}

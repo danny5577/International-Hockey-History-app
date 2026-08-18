@@ -5,12 +5,14 @@ import {
   getGroupsWithTeams,
   getGamesForTournament,
   getTeamsForGames,
-  getAllTeams
+  getAllTeams,
+  getTeamsForTournament
 } from "@/app/lib/db/queries";
 import { Flag } from "@/app/components/Flag";
 import { GameRow } from "@/app/components/GameRow";
 import { AddGroupForm } from "@/app/components/admin/AddGroupForm";
 import { AssignTeamForm } from "@/app/components/admin/AssignTeamForm";
+import { AddGameForm } from "@/app/components/admin/GameForm";
 
 export default async function AdminTournamentPage({
   params,
@@ -26,6 +28,7 @@ export default async function AdminTournamentPage({
     getGroupsWithTeams(tournament.id),
     getGamesForTournament(tournament.id),
   ]);
+  const teamsInTournament= await getTeamsForTournament(tournament.id);
   const teamsById = new Map((await getTeamsForGames(allGames)).map((t) => [t.id, t]));
 
   const groupGames = allGames.filter((g) => g.stage === "group");
@@ -60,6 +63,12 @@ export default async function AdminTournamentPage({
             ))}
           </div>
           <AssignTeamForm groupId={g.id} availableTeams={availableTeams} />
+          <AddGameForm
+             tournamentId={tournament.id}
+             groupId={g.id}
+             fixedStage="group"
+             availableTeams={g.teams}
+          />
         </div>
       );
     })}
@@ -71,7 +80,7 @@ export default async function AdminTournamentPage({
       <section className="mb-10">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-mono text-sm uppercase tracking-widest text-ice">Group Stage Games</h2>
-          <span className="font-mono text-xs text-muted">Add game — next step</span>
+        
         </div>
         {groupGames.length === 0 ? (
           <p className="rounded-lg border border-dashed border-white/10 p-4 font-mono text-sm text-muted">No group games yet.</p>
@@ -83,18 +92,16 @@ export default async function AdminTournamentPage({
       </section>
 
       <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-mono text-sm uppercase tracking-widest text-ice">Playoff Games</h2>
-          <span className="font-mono text-xs text-muted">Add game — next step</span>
-        </div>
-        {playoffGames.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-white/10 p-4 font-mono text-sm text-muted">No playoff games yet.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {playoffGames.map((g) => <GameRow key={g.id} game={g} teams={teamsById} />)}
-          </div>
-        )}
-      </section>
+  <h2 className="mb-3 font-mono text-sm uppercase tracking-widest text-ice">Playoff Games</h2>
+  {playoffGames.length > 0 && (
+    <div className="mb-4 flex flex-col gap-2">
+      {playoffGames.map((g) => (
+        <GameRow key={g.id} game={g} teams={teamsById} />
+      ))}
+    </div>
+  )}
+  <AddGameForm tournamentId={tournament.id} groupId={null} availableTeams={teamsInTournament} />
+</section>
     </div>
   );
 }

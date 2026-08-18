@@ -5,7 +5,8 @@ import { signIn } from "@/app/lib/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/lib/auth";
-import { insertTournament, insertGroup, insertGroupTeam, getGroupById, isTeamInGroup } from "./db/queries";
+import { insertTournament, insertGroup, insertGroupTeam,
+   getGroupById, isTeamInGroup, getTournamentById, insertGame } from "./db/queries";
 import { revalidatePath } from "next/cache";
 
 export async function authenticate(formData: FormData) {
@@ -137,5 +138,77 @@ export async function assignTeamToGroup(
 
   await insertGroupTeam(groupId, parsed.data.teamId);
   revalidatePath(`/admin/tournaments/${group.tournamentId}`);
+  return {};
+}
+
+const gameSchema = z
+  .object({
+    stage: z.enum(["group", "quarterfinal", "semifinal", "bronze", "final", "relegation"]),
+    homeTeamId: z.string().min(1, "Select a team"),
+    awayTeamId: z.string().min(1, "Select a team"),
+    date: z.string().min(1, "Date required"),
+    homeScore: z.coerce.number().int().min(0, "Must be 0 or more"),
+    awayScore: z.coerce.number().int().min(0, "Must be 0 or more"),
+  })
+  .refine((data) => data.homeTeamId !== data.awayTeamId, {
+    message: "Home and away teams must be different",
+    path: ["awayTeamId"],
+  });
+
+export type GameFormState = {
+  errors?: {
+    stage?: string[];
+    homeTeamId?: string[];
+    awayTeamId?: string[];
+    date?: string[];
+    homeScore?: string[];
+    awayScore?: string[];
+    _form?: string[];
+  };
+};
+
+export async function createGame(
+  tournamentId: string,
+  groupId: string | null,
+  prevState: GameFormState,
+  formData: FormData
+): Promise<GameFormState> {
+  const session = await auth();
+  if (!session?.user) return { errors: { _form: ["Not authorized."] } };
+
+  const parsed = gameSchema.safeParse({
+    stage: formData.get("stage"),
+    homeTeamId: formData.get("homeTeamId"),
+    awayTeamId: formData.get("awayTeamId"),
+    date: formData.get("date"),
+    homeScore: formData.get("homeScore"),
+    awayScore: formData.get("awayScore"),
+  });
+
+  if (!parsed.success) {
+    return { errors: z.flattenError(parsed.error).fieldErrors };
+  }
+
+  const overtime = formData.get("overtime") === "on"; // see checkbox note above
+
+  await insertGame({
+    id: crypto.randomUUID(),
+    tournamentId,
+    groupId: parsed.data.stage === "group" ? groupId : null,
+    stage: parsed.data.stage,
+    date: parsed.data.date,
+    homeTeamId: parsed.data.homeTeamId,
+    awayTeamId: parsed.data.awayTeamId,
+    homeScore: parsed.data.homeScore,
+    awayScore: parsed.data.awayScore,
+    overtime,
+  });
+
+  const tournament = await getTournamentById(tournamentId);
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  if (tournament) {
+    revalidatePath(tournament.type === "WC" ? `/wc/${tournament.year}` : `/olympics/${tournament.year}`);
+  }
+
   return {};
 }

@@ -1,7 +1,7 @@
 import { eq, and, inArray } from "drizzle-orm";
 import { db } from "./index";
 import { tournaments, teams, games, playerStats , tournamentGroups, groupTeams} from "./schema";
-import { TournamentType, PlayerStat } from "@/app/lib/types";
+import { TournamentType, PlayerStat, Team, GameStage} from "@/app/lib/types";
 
 export async function getTournament(type: TournamentType, year: number) {
   const rows = await db
@@ -122,4 +122,36 @@ export async function isTeamInGroup(groupId: string, teamId: string) {
 
 export async function insertGroupTeam(groupId: string, teamId: string) {
   await db.insert(groupTeams).values({ groupId, teamId });
+}
+
+export async function getTeamsForTournament(tournamentId: string) {
+  const [groupsWithTeams, gamesInTournament] = await Promise.all([
+    getGroupsWithTeams(tournamentId),
+    getGamesForTournament(tournamentId),
+  ]);
+
+  const teamsMap = new Map<string, Team>();
+  for (const g of groupsWithTeams) {
+    for (const t of g.teams) teamsMap.set(t.id, t);
+  }
+  for (const t of await getTeamsForGames(gamesInTournament)) {
+    teamsMap.set(t.id, t);
+  }
+
+  return [...teamsMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function insertGame(data: {
+  id: string;
+  tournamentId: string;
+  groupId: string | null;
+  stage: GameStage;
+  date: string;
+  homeTeamId: string;
+  awayTeamId: string;
+  homeScore: number;
+  awayScore: number;
+  overtime: boolean;
+}) {
+  await db.insert(games).values(data);
 }
