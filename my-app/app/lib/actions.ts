@@ -6,7 +6,8 @@ import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/lib/auth";
 import { insertTournament, insertGroup, insertGroupTeam,
-   getGroupById, isTeamInGroup, getTournamentById, insertGame } from "./db/queries";
+   getGroupById, isTeamInGroup, getTournamentById, insertGame,
+  deleteGameById, teamHasGamesInTournament, deleteGroupTeam } from "./db/queries";
 import { revalidatePath } from "next/cache";
 
 export async function authenticate(formData: FormData) {
@@ -210,5 +211,40 @@ export async function createGame(
     revalidatePath(tournament.type === "WC" ? `/wc/${tournament.year}` : `/olympics/${tournament.year}`);
   }
 
+  return {};
+}
+
+export async function deleteGame(gameId: string, tournamentId: string, _formData: FormData) {
+  const session = await auth();
+  if (!session?.user) return;
+
+  await deleteGameById(gameId);
+
+  const tournament = await getTournamentById(tournamentId);
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  if (tournament) {
+    revalidatePath(tournament.type === "WC" ? `/wc/${tournament.year}` : `/olympics/${tournament.year}`);
+  }
+}
+
+export type RemoveTeamFormState = { errors?: { _form?: string[] } };
+
+export async function removeTeamFromGroup(
+  groupId: string,
+  teamId: string,
+  tournamentId: string,
+  prevState: RemoveTeamFormState,
+  formData: FormData
+): Promise<RemoveTeamFormState> {
+  const session = await auth();
+  if (!session?.user) return { errors: { _form: ["Not authorized."] } };
+
+  const hasGames = await teamHasGamesInTournament(tournamentId, teamId);
+  if (hasGames) {
+    return { errors: { _form: ["This team has games recorded — delete those first."] } };
+  }
+
+  await deleteGroupTeam(groupId, teamId);
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
   return {};
 }

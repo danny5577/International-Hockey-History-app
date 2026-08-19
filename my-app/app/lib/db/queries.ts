@@ -1,4 +1,4 @@
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, or} from "drizzle-orm";
 import { db } from "./index";
 import { tournaments, teams, games, playerStats , tournamentGroups, groupTeams} from "./schema";
 import { TournamentType, PlayerStat, Team, GameStage} from "@/app/lib/types";
@@ -23,9 +23,10 @@ export async function getGamesForTournament(tournamentId: string) {
   const rows = await db
     .select()
     .from(games)
-    .where(eq(games.tournamentId, tournamentId));
+    .where(eq(games.tournamentId, tournamentId))
+    .orderBy(games.date);
 
-  // DB uses null for "no group"; our Game type uses undefined — reconcile here
+  // DB uses null for "no group"; our Game type uses undefined
   return rows.map((g) => ({ ...g, groupId: g.groupId ?? undefined }));
 }
 
@@ -154,4 +155,25 @@ export async function insertGame(data: {
   overtime: boolean;
 }) {
   await db.insert(games).values(data);
+}
+
+export async function deleteGameById(id: string) {
+  await db.delete(games).where(eq(games.id, id));
+}
+
+export async function teamHasGamesInTournament(tournamentId: string, teamId: string) {
+  const rows = await db
+    .select()
+    .from(games)
+    .where(
+      and(
+        eq(games.tournamentId, tournamentId),
+        or(eq(games.homeTeamId, teamId), eq(games.awayTeamId, teamId))
+      )
+    );
+  return rows.length > 0;
+}
+
+export async function deleteGroupTeam(groupId: string, teamId: string) {
+  await db.delete(groupTeams).where(and(eq(groupTeams.groupId, groupId), eq(groupTeams.teamId, teamId)));
 }

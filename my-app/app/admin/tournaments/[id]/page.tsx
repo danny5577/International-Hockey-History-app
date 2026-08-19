@@ -9,10 +9,11 @@ import {
   getTeamsForTournament
 } from "@/app/lib/db/queries";
 import { Flag } from "@/app/components/Flag";
-import { GameRow } from "@/app/components/GameRow";
 import { AddGroupForm } from "@/app/components/admin/AddGroupForm";
 import { AssignTeamForm } from "@/app/components/admin/AssignTeamForm";
 import { AddGameForm } from "@/app/components/admin/GameForm";
+import { AdminGameRow } from "@/app/components/admin/AdminGameRow";
+import { RemoveTeamButton } from "@/app/components/admin/RemoveTeambutton";
 
 export default async function AdminTournamentPage({
   params,
@@ -59,6 +60,7 @@ export default async function AdminTournamentPage({
               <span key={t.id} className="flex items-center gap-1 font-mono text-xs text-muted">
                 <Flag isoCode={t.isoCode} label={t.name} />
                 {t.code}
+                <RemoveTeamButton groupId={g.id} teamId={t.id} tournamentId={tournament.id} />
               </span>
             ))}
           </div>
@@ -86,7 +88,7 @@ export default async function AdminTournamentPage({
           <p className="rounded-lg border border-dashed border-white/10 p-4 font-mono text-sm text-muted">No group games yet.</p>
         ) : (
           <div className="flex flex-col gap-2">
-            {groupGames.map((g) => <GameRow key={g.id} game={g} teams={teamsById} />)}
+            {groupGames.map((g) => <AdminGameRow key={g.id} game={g} teams={teamsById} tournamentId={tournament.id} />)}
           </div>
         )}
       </section>
@@ -96,7 +98,7 @@ export default async function AdminTournamentPage({
   {playoffGames.length > 0 && (
     <div className="mb-4 flex flex-col gap-2">
       {playoffGames.map((g) => (
-        <GameRow key={g.id} game={g} teams={teamsById} />
+        <AdminGameRow key={g.id} game={g} teams={teamsById} tournamentId={tournament.id} />
       ))}
     </div>
   )}
